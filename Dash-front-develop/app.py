@@ -2,6 +2,10 @@ from layouts import ruta, home, dashboard, aboutus, nombre_cancion, nombre_artis
 from lay import  risk
 from script_inicial.RMSE import calcular_rmse 
 
+#rendimiento de memoria ram
+# from __future__ import print_function
+import psutil
+
 
 from app_ import app
 from spatial import spatial
@@ -55,6 +59,8 @@ sidebar_header = dbc.Row(
                                          className="img-fluid w-50 text-center w-75 pt-5")], className="text-center"),
                        
                         ],
+
+
                     align="center",
                     no_gutters=True,
                     className="justify-content-center"
@@ -62,6 +68,7 @@ sidebar_header = dbc.Row(
                 href="#",
 
             ),
+
             
         ),
         dbc.Col(
@@ -103,13 +110,13 @@ sidebar = dbc.Navbar([html.Div(
                                            className="nav-icon"),  html.Span("Dashboard", className="nav-text")
                                            ], href="/page-5", id="page-5-link", className="nav-header"),
 
-                    #  dbc.NavLink([html.Span(html.I("map", className="material-icons"),
-                    #                        className="nav-icon"),  html.Span("Recomendación", className="nav-text")
-                    #                        ], href="/page-2", id="page-2-link", className="nav-header"),
+                     dbc.NavLink([html.Span(html.I("map", className="material-icons"),
+                                           className="nav-icon"),  html.Span("Recomendación", className="nav-text")
+                                           ], href="/page-2", id="page-2-link", className="nav-header"),
 
-                     dbc.NavLink([html.Span(html.I("favorite", className="material-icons"),
-                                           className="nav-icon"),  html.Span("Exploración", className="nav-text")
-                                           ], href="/page-3", id="page-3-link", className="nav-header"),
+                    #  dbc.NavLink([html.Span(html.I("favorite", className="material-icons"),
+                    #                        className="nav-icon"),  html.Span("Exploración", className="nav-text")
+                    #                        ], href="/page-3", id="page-3-link", className="nav-header"),
 
 
                     dbc.NavLink([html.Span(html.I("supervisor_account", className="material-icons"),
@@ -122,6 +129,15 @@ sidebar = dbc.Navbar([html.Div(
             ),
             id="collapse",
         ),
+        dbc.Row([
+            dcc.Interval(
+                id='interval-memory',
+                interval=1000 # in milliseconds
+                # n_intervals=0
+            ),
+            html.P(id='nav-memory')
+        ]),
+
     ],
 
 ),
@@ -210,14 +226,12 @@ def update_topTitle(pathname):
 
 #Cambiar el valor de las tarjetas rmse
 @app.callback(
-    Output("dashboard rmse", "figure"),
-    [Input("dashboard base", "value"),
-     Input("dashboard model", "value"),
-     Input("dashboard useritem", "value")],
+    Output("nav-memory", "children"),
+    [Input("interval-memory", "n_intervals")]
 )
-def place(base,model,useritem):
-    fig=px.line(rmse[(rmse['base']==base) & (rmse['modelo']==model) & (rmse['user']==useritem)],x="k",y="rmse")
-    return fig
+def memory(n):
+    mem= 'Memoria en uso: ' + str(psutil.virtual_memory()[2]) +'%'
+    return mem
 
 
 if __name__ == "__main__":
