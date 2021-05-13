@@ -1,4 +1,4 @@
-from layouts import ruta, home, dashboard, aboutus, nombre_cancion, nombre_artista, get_key, prediccion_modelo,crear_modelo ,base_prediccion,graficar_red,crear_nueva, song_dict, art_dict ,ratings, ratings_art, rmse ,test_set_a_user,model_a_user,test_predictions_a_user,users_set_a_user, test_set_a_item,model_a_item,test_predictions_a_item,item_set_a_item, model_cos_user, test_set_cos_user, model_cos_item, test_set_cos_item, model_person_user,test_set_person_user, model_person_item, test_set_person_item 
+from layouts import ruta, home, dashboard, aboutus
 from lay import  risk
 from script_inicial.RMSE import calcular_rmse 
 
