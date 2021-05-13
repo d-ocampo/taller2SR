@@ -2,8 +2,9 @@ from layouts import ruta, home, dashboard, aboutus
 from lay import  risk
 from script_inicial.RMSE import calcular_rmse 
 
+import os
+
 #rendimiento de memoria ram
-# from __future__ import print_function
 import psutil
 
 
@@ -27,6 +28,9 @@ import pandas as pd
 server = app.server
 
 # Resources
+
+
+# ruta=
 
 # end resources
 

@@ -174,7 +174,7 @@ top_cards = dbc.Row([
                         #           className="float-right rounded w-40 danger text-center "),
                         html.H5(
                             "Cantidad total de usuarios", className="card-title text-muted font-weight-normal mt-2 mb-3 mr-5"),
-                        html.H4(children = str('{:,}'.format(len(ratings['userid'].unique())))),
+                        html.H4(children = ''),
                     ],
 
                     className="pt-2 pb-2 box "
@@ -194,7 +194,7 @@ top_cards = dbc.Row([
                     [
                         html.H5(
                             "Cantidad de canciones", className="card-title text-muted font-weight-normal mt-2 mb-3 mr-5"),
-                        html.H4(children = str('{:,}'.format(len(ratings['traid'].unique())))),
+                        html.H4(children = ''),
 
                      ],
 
@@ -215,7 +215,7 @@ top_cards = dbc.Row([
                     [
                         html.H5(
                             "Número de artistas", className="card-title text-muted font-weight-normal mt-2 mb-3 mr-5"),
-                        html.H4(children = str('{:,}'.format(len(ratings_art['artid'].unique())))),
+                        html.H4(children = ''),
                     ],
 
                     className="pt-2 pb-2 box"
@@ -235,7 +235,7 @@ top_cards = dbc.Row([
                     [
                         html.H5(
                             "Número de reproducciones", className="card-title text-muted font-weight-normal mt-2 mb-3 mr-5"),
-                        html.H4(children = str('{:,}'.format(ratings['rating_count'].sum()))),
+                        html.H4(children = ''),
                     ],
 
                     className="pt-2 pb-2 box"
@@ -395,9 +395,6 @@ dashboard = html.Div([
                                             className="card-title"),
                                     html.P("En los siguientes histogramas se puede analizar la base de datos que se obtuvo de LastFM para tomar las decisiones correctas sobre los modelos a correr así como también entender la data que se está trabajando en la base total"),
 
-                                    dcc.Graph(
-                                        id='dashboard_hist_user',
-                                        figure=px.histogram(ratings.groupby('traid').agg({'rating_count':'sum'}), x="rating_count", labels = {'rating_count' : 'Número de reproducciones'})),
                                 ]
                             ),
                         ],
@@ -418,8 +415,6 @@ dashboard = html.Div([
                                 [
                                     html.H5("Cantidad de reproducciones por usuario",
                                             className="card-title"),
-
-                                    dcc.Graph(figure = px.histogram(ratings.groupby('userid').agg({'rating_count':'sum'}), x="rating_count", labels = {'rating_count' : 'Número de reproducciones'})),
                                 ]
                             ),
                         ],
@@ -437,7 +432,6 @@ dashboard = html.Div([
                                     html.H5("Cantidad de reproducciones por artista",
                                             className="card-title"),
 
-                                    dcc.Graph(figure = px.histogram(ratings_art.groupby('artid').agg({'rating_count':'sum'}), x="rating_count", labels = {'rating_count' : 'Número de reproducciones'})),
                                 ]
                             ),
                         ],
