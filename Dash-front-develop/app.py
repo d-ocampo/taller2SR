@@ -3,11 +3,7 @@
 # home,dashboard,aboutus
 from lay import  risk
 from script_inicial.RMSE import calcular_rmse 
-
-def dostuff():
-    from layouts import home,dashboard,aboutus
-
-dostuff()
+from layouts import home,dashboard,aboutus, review_df, users_df, business_df,check_df, rev_stars
 
 import os
 
@@ -38,57 +34,6 @@ import pandas as pd
 server = app.server
 
 # Resources
-
-
-################################################################
-ruta = os.getcwd()+'/Data/'
-
-
-n = 1000
-
-# Users
-users = []
-with open(ruta+'yelp_academic_dataset_user.json') as fl:
-    for i, line in enumerate(fl):
-        users.append(json.loads(line))
-        #linea para controlar los registros
-        if i+1 >= n:
-            break
-users_df = pd.DataFrame(users)
-
-#Reviews
-review = []
-with open(ruta+'yelp_academic_dataset_review.json') as fl:
-    for i, line in enumerate(fl):
-        review.append(json.loads(line))
-        #linea para controlar los registros
-        if i+1 >= n:
-            break
-review_df = pd.DataFrame(review)
-
-
-#check in
-check = []
-with open(ruta+'yelp_academic_dataset_checkin.json') as fl:
-    for i, line in enumerate(fl):
-        check.append(json.loads(line))
-        #linea para controlar los registros
-        if i+1 >= n:
-            break
-check_df = pd.DataFrame(check)
-
-
-#business
-business = []
-with open(ruta+'yelp_academic_dataset_business.json') as fl:
-    for i, line in enumerate(fl):
-        business.append(json.loads(line))
-        #linea para controlar los registros
-        if i+1 >= n:
-            break
-business_df = pd.DataFrame(business)
-
-rev_stars = review_df.groupby('stars').agg({'stars':'count'})
 
 
 
@@ -285,7 +230,7 @@ def update_topTitle(pathname):
 ##############################################
 
 
-###### DashBoard ################
+###### Nabar ################
 
 #Cambiar el valor de las tarjetas rmse
 @app.callback(

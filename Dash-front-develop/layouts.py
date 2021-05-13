@@ -1,9 +1,3 @@
-#import dfs 
-def dostuff():
-    from app import review_df, users_df, business_df,check_df, rev_stars
-
-
-
 import dash_core_components as dcc
 import dash_bootstrap_components as dbc
 import dash_html_components as html
@@ -43,6 +37,57 @@ import random
 
 
 #Resources
+
+
+################################################################
+ruta = os.getcwd()+'/Data/'
+
+
+n = 1000
+
+# Users
+users = []
+with open(ruta+'yelp_academic_dataset_user.json') as fl:
+    for i, line in enumerate(fl):
+        users.append(json.loads(line))
+        #linea para controlar los registros
+        if i+1 >= n:
+            break
+users_df = pd.DataFrame(users)
+
+#Reviews
+review = []
+with open(ruta+'yelp_academic_dataset_review.json') as fl:
+    for i, line in enumerate(fl):
+        review.append(json.loads(line))
+        #linea para controlar los registros
+        if i+1 >= n:
+            break
+review_df = pd.DataFrame(review)
+
+
+#check in
+check = []
+with open(ruta+'yelp_academic_dataset_checkin.json') as fl:
+    for i, line in enumerate(fl):
+        check.append(json.loads(line))
+        #linea para controlar los registros
+        if i+1 >= n:
+            break
+check_df = pd.DataFrame(check)
+
+
+#business
+business = []
+with open(ruta+'yelp_academic_dataset_business.json') as fl:
+    for i, line in enumerate(fl):
+        business.append(json.loads(line))
+        #linea para controlar los registros
+        if i+1 >= n:
+            break
+business_df = pd.DataFrame(business)
+
+rev_stars = review_df.groupby('stars').agg({'stars':'count'})
 
 rev_feel = review_df[['stars', 'useful', 'funny', 'cool']]
 rev_feel = pd.melt(rev_feel, id_vars=['stars'],   var_name='feeling', value_name='prom')
@@ -181,7 +226,7 @@ top_cards = dbc.Row([
                         #           className="float-right rounded w-40 danger text-center "),
                         html.H5(
                             "Cantidad total de usuarios", className="card-title text-muted font-weight-normal mt-2 mb-3 mr-5"),
-                        html.H4(children = ''),
+                        html.H4(children = str('{:,}'.format(len(review_df['user_id'].unique())))),
                     ],
 
                     className="pt-2 pb-2 box "
@@ -200,8 +245,8 @@ top_cards = dbc.Row([
                 dbc.CardBody(
                     [
                         html.H5(
-                            "Cantidad de canciones", className="card-title text-muted font-weight-normal mt-2 mb-3 mr-5"),
-                        html.H4(children = ''),
+                            "Cantidad de negocios", className="card-title text-muted font-weight-normal mt-2 mb-3 mr-5"),
+                        html.H4(children = str('{:,}'.format(len(review_df['business_id'].unique())))),
 
                      ],
 
@@ -221,8 +266,8 @@ top_cards = dbc.Row([
                 dbc.CardBody(
                     [
                         html.H5(
-                            "Número de artistas", className="card-title text-muted font-weight-normal mt-2 mb-3 mr-5"),
-                        html.H4(children = ''),
+                            "Prom. palabras por reseña", className="card-title text-muted font-weight-normal mt-2 mb-3 mr-5"),
+                        html.H4(children = str('{:,}'.format(users_df['review_count'].median()))),
                     ],
 
                     className="pt-2 pb-2 box"
@@ -241,8 +286,8 @@ top_cards = dbc.Row([
                 dbc.CardBody(
                     [
                         html.H5(
-                            "Número de reproducciones", className="card-title text-muted font-weight-normal mt-2 mb-3 mr-5"),
-                        html.H4(children = ''),
+                            "Cantidad de reseñas", className="card-title text-muted font-weight-normal mt-2 mb-3 mr-5"),
+                        html.H4(children = str('{:,}'.format(review_df['review_id'].count()))),
                     ],
 
                     className="pt-2 pb-2 box"
@@ -262,6 +307,7 @@ top_cards = dbc.Row([
         className="mt-1 mb-2"
 
     )
+
 
 
 home = html.Div([
