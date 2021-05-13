@@ -95,6 +95,12 @@ rev_feel = pd.DataFrame(rev_feel.groupby(['stars', 'feeling']).agg({'prom':'mean
 rev_feel['stars'] = rev_feel['stars'].astype("str")
 
 
+total_data=pd.merge(review_df,business_df, on='business_id', how='inner')
+total_data=pd.merge(total_data, users_df, on='user_id',how='inner')
+total_data=pd.merge(total_data,check_df, on='business_id', how='inner')
+
+
+
 #graficar la red de recomendaciones
 
 

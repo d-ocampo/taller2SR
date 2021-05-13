@@ -10,6 +10,11 @@ import numpy as np
 import plotly.express as px
 import json
 
+#import dfs
+from layouts import review_df, users_df, business_df,check_df, rev_stars, total_data
+
+
+
 spatial = html.Div([
 
     dbc.Row(
@@ -20,18 +25,9 @@ spatial = html.Div([
                         [
                             dbc.CardBody(
                                 [
-                                    html.H5("Tipo de recomendación",
+                                    html.H5("Usuario para recomendación",
                                             className="card-title"),
-                                    html.P("Seleccione la recomendación que desea realizar haciendo click en la lista"),
-                                    dcc.RadioItems(
-                                        options=[
-                                            {'label': 'Usuario-Usuario', 'value': 1},
-                                            {'label': 'Item-Item', 'value': 0},
-                                        ],
-                                        value=1,
-                                        id='recomend seleccion',
-                                        style={'display': 'inline-block'}
-                                    )  
+                                    html.P(id='recommend user')
 
                                 ]
                             ),
@@ -49,8 +45,10 @@ spatial = html.Div([
                                 [
                                     html.H5("Seleccione:",
                                             className="card-title"),
-                                    html.P("Acá abajo puede seleccionar el usuario o item sobre el cual desea obtener una recomendación"),
-                                    dcc.Dropdown(id='recomend drop'),
+                                    html.P("Acá abajo puede seleccionar el usuario"),
+                                    dcc.Dropdown(id='recomend drop',
+                                                 options=[{'label': i, 'value': i} for i in list(total_data['user_id'].unique())]
+                                                 ),
                                 ]
                             ),
                         ],

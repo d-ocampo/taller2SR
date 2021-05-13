@@ -3,10 +3,9 @@
 # home,dashboard,aboutus
 from lay import  risk
 from script_inicial.RMSE import calcular_rmse 
-from layouts import home,dashboard,aboutus, review_df, users_df, business_df,check_df, rev_stars
+from layouts import home,dashboard,aboutus, review_df, users_df, business_df,check_df, rev_stars, total_data
 
 import os
-
 #rendimiento de memoria ram
 import psutil
 
@@ -32,9 +31,6 @@ import pandas as pd
 
 
 server = app.server
-
-# Resources
-
 
 
 # end resources
