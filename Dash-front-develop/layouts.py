@@ -1,3 +1,9 @@
+#import dfs 
+def dostuff():
+    from app import review_df, users_df, business_df,check_df, rev_stars
+
+
+
 import dash_core_components as dcc
 import dash_bootstrap_components as dbc
 import dash_html_components as html
@@ -38,9 +44,10 @@ import random
 
 #Resources
 
-#Cargar la ruta
-
-ruta=os.getcwd()+'/Data/'
+rev_feel = review_df[['stars', 'useful', 'funny', 'cool']]
+rev_feel = pd.melt(rev_feel, id_vars=['stars'],   var_name='feeling', value_name='prom')
+rev_feel = pd.DataFrame(rev_feel.groupby(['stars', 'feeling']).agg({'prom':'mean'})).reset_index()
+rev_feel['stars'] = rev_feel['stars'].astype("str")
 
 
 #graficar la red de recomendaciones
@@ -308,8 +315,8 @@ home = html.Div([
                                     ''',
                                     className="card-text", style = {"font-size": "15px"},
                                 ),
-                                dbc.Button(
-                                    "Dashboard", color="primary", href="/page-5"),
+                                # dbc.Button(
+                                #     "Dashboard", color="primary", href="/page-5"),
                             ],
                             className="text-center"
                         ),
@@ -329,8 +336,8 @@ home = html.Div([
                                     '''Acá puedes encontrar el sistema de recomendación basado en perfiles de usuario y canciones con la primera mitad de los datos de Last.FM''',
                                     className="card-text", style = {"font-size": "15px"},
                                 ),
-                                dbc.Button("Sistema de recomendación",
-                                           color="primary", href="/page-2"),
+                                # dbc.Button("Sistema de recomendación",
+                                #            color="primary", href="/page-2"),
                             ],
                             className="text-center"
                         ),
@@ -378,6 +385,7 @@ home = html.Div([
 
 ])
 
+
 dashboard = html.Div([
 
     top_cards,
@@ -391,179 +399,63 @@ dashboard = html.Div([
                                 [
 
 
-                                    html.H5("Cantidad de canciones por número de reproducciones",
+                                    html.H5("Cantidad de reseñas por calificación",
                                             className="card-title"),
-                                    html.P("En los siguientes histogramas se puede analizar la base de datos que se obtuvo de LastFM para tomar las decisiones correctas sobre los modelos a correr así como también entender la data que se está trabajando en la base total"),
-
-                                ]
-                            ),
-                        ],
-                    )
-                ],
-                className="mt-1 mb-2 pl-3 pr-3"
-            ),
-        ],
-    ),
-
-    dbc.Row(
-        [
-            dbc.Col(
-                [
-                    dbc.Card(
-                        [
-                            dbc.CardBody(
-                                [
-                                    html.H5("Cantidad de reproducciones por usuario",
-                                            className="card-title"),
-                                ]
-                            ),
-                        ],
-                    )
-                ],
-                className="mt-1 mb-2 pl-3 pr-3", lg="6", sm="12", md="auto"
-            ),
-
-            dbc.Col(
-                [
-                    dbc.Card(
-                        [
-                            dbc.CardBody(
-                                [
-                                    html.H5("Cantidad de reproducciones por artista",
-                                            className="card-title"),
-
-                                ]
-                            ),
-                        ],
-                    )
-                ],
-                className="mt-1 mb-2 pl-3 pr-3", lg="6", sm="12", md="auto"
-            ),
-        ],
-    ),
-
-    dbc.Row(
-        [
-            dbc.Col(
-                [
-                    dbc.Card(
-                        [
-                            dbc.CardBody(
-                                [
-
-
-                                    html.H5("RMSE",
-                                            className="card-title"),
-                                    html.P("Con la selección siguiente se puede revisar el rmse de los modelos que se consideraron para este estudio"),
-                                    dcc.RadioItems(
-                                        options=[{'label': 'Canciones','value':'ratings'},
-                                                 {'label': 'Artistas','value':'ratings_art'}],
-                                        id='dashboard base',
-                                        value='ratings'
-                                        
-                                    ),
-                                    dcc.RadioItems(
-                                        options=[{'label': 'Coseno','value':'cosine'},
-                                                 {'label': 'Pearson','value':'pearson'}],
-                                        id='dashboard model',
-                                        value='cosine'
-                                        
-                                    ),
-                                    dcc.RadioItems(
-                                        options=[{'label': 'Usuario','value':True},
-                                                 {'label': 'Item','value':False}],
-                                        id='dashboard useritem',
-                                        value=True
-                                        
-                                    ),
-                                    dcc.Graph(
-                                        id='dashboard rmse',
-                                        ),
-
-                                ]
-                            ),
-                        ],
-                    )
-                ],
-                className="mt-1 mb-2 pl-3 pr-3"
-            ),
-        ],
-    ),
-    dbc.Row(
-        [
-            dbc.Col(
-                [
-                    dbc.Card(
-                        [
-                            dbc.CardBody(
-                                [
-
-
-                                    html.H5("Panel de control",
-                                            className="card-title"),
-                                    html.P('''En esta parte podrás re-calibrar los modelos dadas tus preferencias 
-                                           para mejorar el ajuste del modelo, así el primer slider tiene el tamaño
-                                           del test, después puedes elegir el método de similitud, también si el modelo
-                                           está basado en USUARIO o ITEM, elegir desde qué número de reproducciones
-                                           vas a crear el modelo y por último la cantiad de vecinos '''),
-                                    dcc.Slider(
-                                        min=0.1,
-                                        max=0.9,
-                                        step=0.1,
-                                        value=0.5,
-                                        marks={
-                                                0.1: '10%',
-                                                0.5: '50%',
-                                                0.9: '90%'
-                                            },
-                                        id="dashboard testmodelo"
-                                    ),
                                     
-                                    dcc.RadioItems(
-                                        options=[{'label': 'Coseno','value':'cosine'},
-                                                 {'label': 'Pearson','value':'pearson'}],
-                                        id='dashboard modelmodelo',
-                                        value='cosine'
+                                    
+                                    dcc.Graph(
+                                        id='dashboard_hist_user',
+
                                         
-                                    ),
-                                    dcc.RadioItems(
-                                        options=[{'label': 'Usuario','value':True},
-                                                 {'label': 'Item','value':False}],
-                                        id='dashboard useritemmodelo',
-                                        value=True
-                                    ),
-                                    dcc.Slider(
-                                        min=20,
-                                        max=100,
-                                        step=5,
-                                        value=30,
-                                            marks={
-                                                30: 'Desde 30',
-                                                80: 'Desde 80',
-                                            },
-                                        id="dashboard trimmodelo"
-                                    ),
-                                    dcc.Slider(
-                                        min=5,
-                                        max=80,
-                                        step=5,
-                                        value=20,
-                                            marks={
-                                                5: '5 Vecinos',
-                                                30: '30 Vecinos',
-                                                60: '60 Vecinos',
-                                            },
-                                        id="dashboard kmodelo"
-                                    ),
                                         
-                                    html.Button('Correr el modelo',id="dashboard corrermodelo", style={'width' : '100%'}),
-                                    html.P(id='dashboard respuesta')
+                                        figure=px.bar(rev_stars, y = "stars", labels = {'index': 'stars', 'stars' : 'cantidad'})),
+                                    
                                 ]
                             ),
                         ],
                     )
                 ],
                 className="mt-1 mb-2 pl-3 pr-3"
+            ),
+        ],
+    ),
+
+    dbc.Row(
+        [
+            dbc.Col(
+                [
+                    dbc.Card(
+                        [
+                            dbc.CardBody(
+                                [
+                                    html.H5("Cantidad de reseñas por negocio",
+                                            className="card-title"),
+
+                                    dcc.Graph(figure = px.histogram(review_df.groupby('business_id').agg({'stars':'count'}), x="stars", labels = {'stars' : 'reviews'})),
+                                ]
+                            ),
+                        ],
+                    )
+                ],
+                className="mt-1 mb-2 pl-3 pr-3", lg="6", sm="12", md="auto"
+            ),
+
+            dbc.Col(
+                [
+                    dbc.Card(
+                        [
+                            dbc.CardBody(
+                                [
+                                    html.H5("Relación entre estrellas y sentimientos",
+                                            className="card-title"),
+
+                                    dcc.Graph(figure =px.bar(rev_feel, x="stars", y="prom", color = 'feeling')),
+                                ]
+                            ),
+                        ],
+                    )
+                ],
+                className="mt-1 mb-2 pl-3 pr-3", lg="6", sm="12", md="auto"
             ),
         ],
     ),
@@ -572,7 +464,6 @@ dashboard = html.Div([
 ],
     className='container',
 )
-
 
 
 
