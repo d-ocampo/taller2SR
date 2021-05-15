@@ -38,68 +38,11 @@ import random
 
 #Resources
 
+#Cargar la ruta
 
-################################################################
-ruta = os.getcwd()+'/Data/'
+ruta=os.getcwd()+'/Data/'
 
-
-n = 1000
-
-# Users
-users = []
-with open(ruta+'yelp_academic_dataset_user.json') as fl:
-    for i, line in enumerate(fl):
-        users.append(json.loads(line))
-        #linea para controlar los registros
-        if i+1 >= n:
-            break
-users_df = pd.DataFrame(users)
-
-#Reviews
-review = []
-with open(ruta+'yelp_academic_dataset_review.json') as fl:
-    for i, line in enumerate(fl):
-        review.append(json.loads(line))
-        #linea para controlar los registros
-        if i+1 >= n:
-            break
-review_df = pd.DataFrame(review)
-
-
-#check in
-check = []
-with open(ruta+'yelp_academic_dataset_checkin.json') as fl:
-    for i, line in enumerate(fl):
-        check.append(json.loads(line))
-        #linea para controlar los registros
-        if i+1 >= n:
-            break
-check_df = pd.DataFrame(check)
-
-
-#business
-business = []
-with open(ruta+'yelp_academic_dataset_business.json') as fl:
-    for i, line in enumerate(fl):
-        business.append(json.loads(line))
-        #linea para controlar los registros
-        if i+1 >= n:
-            break
-business_df = pd.DataFrame(business)
-
-rev_stars = review_df.groupby('stars').agg({'stars':'count'})
-
-rev_feel = review_df[['stars', 'useful', 'funny', 'cool']]
-rev_feel = pd.melt(rev_feel, id_vars=['stars'],   var_name='feeling', value_name='prom')
-rev_feel = pd.DataFrame(rev_feel.groupby(['stars', 'feeling']).agg({'prom':'mean'})).reset_index()
-rev_feel['stars'] = rev_feel['stars'].astype("str")
-
-
-total_data=pd.merge(review_df,business_df, on='business_id', how='inner')
-total_data=pd.merge(total_data, users_df, on='user_id',how='inner')
-total_data=pd.merge(total_data,check_df, on='business_id', how='inner')
-
-
+####Funciones 
 
 #graficar la red de recomendaciones
 
@@ -218,8 +161,65 @@ def graficar_red(edges,user):
     return fig
 
 
+n=100000
+
+# Users
+users = []
+with open(ruta+'yelp_academic_dataset_user.json') as fl:
+    for i, line in enumerate(fl):
+        users.append(json.loads(line))
+        #linea para controlar los registros
+        if i+1 >= n:
+            break
+users_df = pd.DataFrame(users)
+
+#Reviews
+review = []
+with open(ruta+'yelp_academic_dataset_review.json') as fl:
+    for i, line in enumerate(fl):
+        review.append(json.loads(line))
+        #linea para controlar los registros
+        if i+1 >= n:
+            break
+review_df = pd.DataFrame(review)
 
 
+#check in
+check = []
+with open(ruta+'yelp_academic_dataset_checkin.json') as fl:
+    for i, line in enumerate(fl):
+        check.append(json.loads(line))
+        #linea para controlar los registros
+        if i+1 >= n:
+            break
+check_df = pd.DataFrame(check)
+
+
+#business
+business = []
+with open(ruta+'yelp_academic_dataset_business.json') as fl:
+    for i, line in enumerate(fl):
+        business.append(json.loads(line))
+        #linea para controlar los registros
+        if i+1 >= n:
+            break
+business_df = pd.DataFrame(business)
+
+rev_stars = review_df.groupby('stars').agg({'stars':'count'})
+
+rev_feel = review_df[['stars', 'useful', 'funny', 'cool']]
+rev_feel = pd.melt(rev_feel, id_vars=['stars'],   var_name='feeling', value_name='prom')
+rev_feel = pd.DataFrame(rev_feel.groupby(['stars', 'feeling']).agg({'prom':'mean'})).reset_index()
+rev_feel['stars'] = rev_feel['stars'].astype("str")
+########
+
+
+
+total_data=pd.merge(review_df,business_df, on='business_id', how='inner')
+total_data=pd.merge(total_data, users_df, on='user_id',how='inner')
+total_data=pd.merge(total_data,check_df, on='business_id', how='inner')
+
+print(total_data)
 
 
 
@@ -315,7 +315,6 @@ top_cards = dbc.Row([
     )
 
 
-
 home = html.Div([
     # dbc.Jumbotron(
     #     [
@@ -333,15 +332,14 @@ home = html.Div([
                    style={"padding": "1rem", "transform" : "rotate(90deg)", "font-size": "2rem", "color": "#999999"}, ),
 # Descripción del problema
             html.P('''
-                    El dataset ocupado en la presente herramienta se compone de tuplas <user, timestamp, artist, song> previamente tomadas de la API de Last.fm, 
-                    usando el método .getRecentTracks().
-                    El dataset contiene datos de hábitos de reproducción (hasta May, 5th 2009) para algo menos de mil usuarios.
+                    El conjunto de datos de Yelp es un subconjunto de negocios, reseñas y datos de usuario para su uso con fines personales, educativos y académicos. Disponible como archivos JSON, incluye
+                    cuatro tablas principales con datos de negocios, reseñas, usuarios, fotos, checkins y reseñas cortas.
                    ''',
             style = { "font-color": "#666666", "font-size": "16px", "margin": "1rem auto 0", "padding": "0 12rem"}, className="text-muted"
             
             ),
 
-            html.P('''Licencia: Los datos contenidos en lastfm-dataset-1K.tar.gz son distribuidos y manipulados con permiso de Last.FM. Los datos se encuentran disponibles para su no comercial. Para más información, se sugiere revisar los términos de servicio de Last.fm.''', style = { "font-color": "#666666", "font-size": "16px", "margin": "1rem auto 0", "padding": "0 12rem"}, className="text-muted"),
+            html.P('''Licencia: Los datos contenidos en esta herramienta son distribuidos y manipulados con permiso de Yelp. Los datos se encuentran disponibles para su uso no comercial. Para más información, se sugiere revisar los términos de servicio de Yelp (https://www.yelp.com/dataset/).''', style = { "font-color": "#666666", "font-size": "16px", "margin": "1rem auto 0", "padding": "0 12rem"}, className="text-muted"),
 
             html.Hr(style = {"width" : "100px", "border": "3px solid #999999", "background-color": "#999999", "margin": "3rem auto"}),
 
@@ -362,13 +360,13 @@ home = html.Div([
                             [
                                 html.H3("Dashboard", style = {"color": "#66666"}),
                                 html.P(
-                                    '''Un espacio para obtener estadísticas básicas de usuarios, artistas y reproducciones con los datos de Last.FM.
+                                    '''Un espacio para obtener estadísticas básicas de usuarios, negocios, reseñas e interacciones, junto a algunos insights sobre sus calificaciones.
                                     
                                     ''',
                                     className="card-text", style = {"font-size": "15px"},
                                 ),
-                                # dbc.Button(
-                                #     "Dashboard", color="primary", href="/page-5"),
+                                dbc.Button(
+                                    "Dashboard", color="primary", href="/page-5"),
                             ],
                             className="text-center"
                         ),
@@ -385,11 +383,11 @@ home = html.Div([
                                 html.H3("Recomendación", style = {"color": "#66666"}),
 
                                 html.P(
-                                    '''Acá puedes encontrar el sistema de recomendación basado en perfiles de usuario y canciones con la primera mitad de los datos de Last.FM''',
+                                    '''Acá puedes encontrar el sistema de recomendación híbrido basado en la combinación de modelos colaborativos, de contenido, con factorización,...''',
                                     className="card-text", style = {"font-size": "15px"},
                                 ),
-                                # dbc.Button("Sistema de recomendación",
-                                #            color="primary", href="/page-2"),
+                                dbc.Button("Sistema de recomendación",
+                                           color="primary", href="/page-2"),    
                             ],
                             className="text-center"
                         ),
@@ -397,7 +395,29 @@ home = html.Div([
                     style={"width": "18rem"},
                 ),
 
+                dbc.Card(
+                    [
+                        dbc.CardImg(
+                            src="/assets/images/map.png", top=True),
+                        dbc.CardBody(
 
+                            [  html.H3("Exploración por usuarios", style = {"color": "#66666"}),
+
+                                html.P(
+                                    '''
+                                    Finalmente, un apartado con las predicciones y el sistema diseñado para obtener recomendaciones de cualquier usuario en el sistema.
+                                    ''',
+                                    className="card-text", style = {"font-size": "15px"},
+                                ),
+
+                                dbc.Button("Exploration", color="primary",
+                                           href="/page-3", style={"align": "center"}),
+                            ],
+                            className="text-center"
+                        ),
+                    ],
+                    style={"width": "18rem", "margin": "0 0 0 1rem"},                
+                    )
 
             ]),
 
@@ -436,7 +456,6 @@ home = html.Div([
     )
 
 ])
-
 
 dashboard = html.Div([
 
@@ -516,6 +535,7 @@ dashboard = html.Div([
 ],
     className='container',
 )
+
 
 
 

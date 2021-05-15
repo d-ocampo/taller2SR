@@ -13,8 +13,6 @@ import json
 #import dfs
 from layouts import review_df, users_df, business_df,check_df, rev_stars, total_data
 
-
-
 spatial = html.Div([
 
     dbc.Row(
@@ -27,7 +25,7 @@ spatial = html.Div([
                                 [
                                     html.H5("Usuario para recomendación",
                                             className="card-title"),
-                                    html.P(id='recommend user')
+                                    html.P(id='recomend user')
 
                                 ]
                             ),
@@ -58,57 +56,112 @@ spatial = html.Div([
             ),
         ],
     ),
+ dbc.Row([
+        dbc.Col([dbc.Card(
+            [
+                dbc.CardBody(
+                    [
+                        html.H3('Alfa 1'),
+                        dcc.Slider(id='a1',
+                                        min=0,
+                                        max=1,
+                                        step=0.1,
+                                   )                    ],
 
-
-      dbc.Row(
-        [
-            dbc.Col(
-                [
-                    dbc.Card(
-                        [
-                            dbc.CardBody(
-                                [
-
-                                    html.H3("Sistema de recomendación interactivo",
-                                            className="card-title"),
-                                    html.P("Con el Slider puede obtener la n cantidad de recomendaciones que desee"),
-                                    dcc.Slider(id='recomend slider',
-                                        min=5,
-                                        max=50,
-                                        step=5,
-                                        value=10,
-                                        ),
-                                    dcc.Graph(id='recomend red'), 
-                                ]
-                            ),
-                        ],
-                    )
-                ],
-                className="mt-1 mb-2 pl-3 pr-3"
-            ),
+                    className="pt-2 pb-2 box "
+                ),
+            ],
+            #color="warning",
+            outline=True,
+            #style={"width": "18rem"},
+        ),
         ],
-    ),
-    dbc.Row(
-        [
-            dbc.Col(
-                [
-                    dbc.Card(
-                        [
-                            dbc.CardBody(
-                                [
+            className="col-xs-12 col-sm-6 col-xl-3 pl-3 pr-3 pb-3 pb-xl-0"
+        ),
+        dbc.Col([dbc.Card(
+            [
 
-                                    html.H3("Listado de recomendaciones",
-                                            className="card-title"),
-                                    html.Ul(id='recomend lista')
-                                ]
-                            ),
-                        ],
-                    )
-                ],
-                className="mt-1 mb-2 pl-3 pr-3"
-            ),
+                dbc.CardBody(
+                    [
+                        html.H3('Alfa 2'),
+                        dcc.Slider(id='a2',
+                                        min=0,
+                                        max=1,
+                                        step=0.1,
+                                   )
+                     ],
+
+                    className="pt-2 pb-2 box"
+                ),
+            ],
+            # color="success",
+            outline=True,
+            #style={"width": "18rem"},
+        ),
         ],
+
+            className="col-xs-12 col-sm-6 col-xl-3 pl-3 pr-3 pb-3 pb-xl-0"
+        ),
+        dbc.Col([dbc.Card(
+            [
+                dbc.CardBody(
+                    [
+                        html.H3('Alfa 3'),
+                        dcc.Slider(id='a3',
+                                        min=0,
+                                        max=1,
+                                        step=0.1,
+                                   )                    ],
+
+                    className="pt-2 pb-2 box"
+                ),
+            ],
+            # color="info",
+            outline=True,
+            #style={"width": "18rem"},
+        ),
+        ],
+
+            className="col-xs-12 col-sm-6 col-xl-3 pl-3 pr-3 pb-3 pb-xl-0"
+        ),
+        dbc.Col([dbc.Card(
+            [
+                dbc.CardBody(
+                    [
+                        html.H3('Alfa 4'),
+                        dcc.Slider(id='a4',
+                                        min=0,
+                                        max=1,
+                                        step=0.1,
+                                   )
+  
+                      ],
+
+                    className="pt-2 pb-2 box"
+                ),
+            ],
+            # color="warning",
+            outline=True,
+            #style={"width": "18rem"},
+        ),
+        ],
+
+            className="col-xs-12 col-sm-6 col-xl-3 pl-3 pr-3 pb-3 pb-xl-0"
+        ),
+
+
+    ],
+        className="mt-1 mb-2"
+
     ),
+    dbc.Col([
+        dbc.Row([
+            dbc.Card([
+                dcc.Graph(id='recomend rmse')
+            ])
+        ])
+    ])
+
 
 ],
     className='container',

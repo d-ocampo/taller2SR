@@ -237,11 +237,82 @@ def memory(n):
     mem= 'Memoria en uso: ' + str(psutil.virtual_memory()[2]) +'%'
     return mem
 
+##### Recomendación #########
+
+#Cambiar el valor de las tarjetas rmse
+@app.callback(
+    Output("recomend user", "children"),
+    [Input("recomend drop", "value")]
+)
+def fun_call(value):
+    return value
+
+
+#Cambiar el valor de las tarjetas rmse
+@app.callback(
+    Output("recomend user", "children"),
+    [Input("recomend drop", "value")]
+)
+def fun_call(value):
+    return value
+
+
+
+#Cambiar el valor de las tarjetas rmse
+@app.callback(
+    Output("recomend rmse", "figure"),
+    [Input("a1", "value"),
+     Input("a2", "value"),
+     Input("a3", "value"),
+     Input("a4", "value")]
+)
+def fun_call(a1,a2,a3,a4):
+    alfa=[a1,a3,a3,a4]
+    
+    rawTrain,rawholdout = train_test_split(ratings, test_size=0.25 )
+
+    reader = surprise.Reader(rating_scale=(1,5)) 
+    #into surprise:
+    data = surprise.Dataset.load_from_df(rawTrain,reader)
+    rmseHyb=[]
+    for trainset, testset in kSplit.split(data): #iterate through the folds.
+        slopeOne.fit(trainset)
+        collabKNN.fit(trainset)
+        funkSVD.fit(trainset)
+        coClus.fit(trainset)
+        predictions = [slopeOne.test(testset),
+                    collabKNN.test(testset),
+                    funkSVD.test(testset),
+                    coClus.test(testset)]
+        rmseHyb.append([surprise.accuracy.rmse(pred,verbose=True) for pred  in predictions])#get root means squared error    
+        
+
+    def rmseH(a1,a2,a3,a4,l):
+        rmse=[]
+        for j in range(len(l)):
+            rmse.append(l[j][0]*a1 + l[j][1]*a2  + l[j][2]*a3 + l[j][3]*a4)
+        return rmse
+
+    rmseHYBRID=rmseH(alfa[0], alfa[1], alfa[2], alfa[3], rmseHyb)
+
+    x=list(len(rmseHYBRID))
+
+
+    fig = go.Figure(data=go.Scatter(x=x, y=rmseHYBRID))
+
+
+    return fig
+
+
+
+
+
+
 
 if __name__ == "__main__":
     app.run_server(debug=False,
                    host ='0.0.0.0',
-                   port=8000,
+                   port=8500,
                    threaded=True,
                    dev_tools_hot_reload=True
                    )
