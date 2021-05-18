@@ -334,7 +334,6 @@ def business_atributes(field):
 data_atributes=total_data[['business_id','attributes']]
 data_atributes['attributes']=data_atributes['attributes'].astype(str)
 data_atributes=data_atributes.drop_duplicates().reset_index()
-print(data_atributes)
 data_atributes['attributes']=data_atributes['attributes'].apply(lambda x: business_atributes(x))
 
 # Modelo basado en similaridad
