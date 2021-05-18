@@ -137,7 +137,7 @@ sidebar = dbc.Navbar([html.Div(
         dbc.Row([
             dcc.Interval(
                 id='interval-memory',
-                interval=1000000 # in milliseconds
+                interval=1000 # in milliseconds
                 # n_intervals=0
             ),
             html.P(id='nav-memory')
@@ -333,7 +333,7 @@ def fun_call(retorno,modelos):
 if __name__ == "__main__":
     app.run_server(debug=False,
                    host ='0.0.0.0',
-                   port=8500,
+                   port=8000,
                    threaded=True,
                    dev_tools_hot_reload=True
                    )
