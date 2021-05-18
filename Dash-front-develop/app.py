@@ -3,7 +3,7 @@
 # home,dashboard,aboutus
 from lay import  risk
 from script_inicial.RMSE import calcular_rmse 
-from layouts import home,dashboard,aboutus, review_df, users_df, business_df,check_df, rev_stars, total_data
+from layouts import home,dashboard,aboutus, review_df, users_df, business_df,check_df, rev_stars, total_data, recomendacion_usuario, negocios_similares, alfas_restantes, data, holdout, train_set, test_set, rmseHyb,rmseH, results, results_at, business_dict, nombre_negocio, get_key_bus
 
 import os
 #rendimiento de memoria ram
@@ -137,7 +137,7 @@ sidebar = dbc.Navbar([html.Div(
         dbc.Row([
             dcc.Interval(
                 id='interval-memory',
-                interval=1000 # in milliseconds
+                interval=1000000 # in milliseconds
                 # n_intervals=0
             ),
             html.P(id='nav-memory')
@@ -245,70 +245,89 @@ def memory(n):
     [Input("recomend drop", "value")]
 )
 def fun_call(value):
-    return value
-
-
-#Cambiar el valor de las tarjetas rmse
-@app.callback(
-    Output("recomend user", "children"),
-    [Input("recomend list", "value")]
-)
-def fun_call(value):
-
     
     return value
 
 
 
 #Cambiar el valor de las tarjetas rmse
+# ingresa alfa 1
 @app.callback(
-    Output("recomend rmse", "figure"),
+    [Output("a2", "value"),
+     Output("a3", "value"),
+     Output("a4", "value")],
+    [Input("a1", "value")]
+)
+def fun_call(a):
+    alfas_list=list(alfas_restantes(a))
+    return alfas_list
+
+# ingresa alfa 2,3,4
+@app.callback(
+    Output("a1", "value"),
+    [Input("a2", "value"),
+     Input("a3", "value"),
+     Input("a4", "value")]
+)
+def fun_call(a2,a3,a4):
+    a1 = 1 - a2 -a3- a4
+    return a1
+
+
+# figura de vector de rmse hybrido
+@app.callback(
+    Output("recomend rmse graph", "figure"),
     [Input("a1", "value"),
-     Input("a2", "value"),
+    Input("a2", "value"),
      Input("a3", "value"),
      Input("a4", "value")]
 )
 def fun_call(a1,a2,a3,a4):
-    alfa=[a1,a3,a3,a4]
-    
-    rawTrain,rawholdout = train_test_split(ratings, test_size=0.25 )
-
-    reader = surprise.Reader(rating_scale=(1,5)) 
-    #into surprise:
-    data = surprise.Dataset.load_from_df(rawTrain,reader)
-    rmseHyb=[]
-    for trainset, testset in kSplit.split(data): #iterate through the folds.
-        slopeOne.fit(trainset)
-        collabKNN.fit(trainset)
-        funkSVD.fit(trainset)
-        coClus.fit(trainset)
-        predictions = [slopeOne.test(testset),
-                    collabKNN.test(testset),
-                    funkSVD.test(testset),
-                    coClus.test(testset)]
-        rmseHyb.append([surprise.accuracy.rmse(pred,verbose=True) for pred  in predictions])#get root means squared error    
-        
-
-    def rmseH(a1,a2,a3,a4,l):
-        rmse=[]
-        for j in range(len(l)):
-            rmse.append(l[j][0]*a1 + l[j][1]*a2  + l[j][2]*a3 + l[j][3]*a4)
-        return rmse
-
+    # Alfas iguales
+    alfa=[a1,a2,a3,a4]
+    # calcular rmse híbrido
     rmseHYBRID=rmseH(alfa[0], alfa[1], alfa[2], alfa[3], rmseHyb)
-
-    x=list(len(rmseHYBRID))
-
-
+    #vector de kfolds
+    x=list(range(1,(len(rmseHYBRID)+1)))
     fig = go.Figure(data=go.Scatter(x=x, y=rmseHYBRID))
-
-
     return fig
 
 
+# Calcular negocio recomendado con los diferentes modeloss
+@app.callback(
+    [Output("recomend one", "children"),
+     Output("recomend estimation", "children"),
+     Output("recomend real", "children"),
+     Output("recomend bid", "children")],
+    [Input("recomend drop", "value"),
+     Input("a1", "value"),
+     Input("a2", "value"),
+     Input("a3", "value"),
+     Input("a4", "value")]
+)
+def fun_call(usuario,a1,a2,a3,a4):
+    negocio, estimation, real =recomendacion_usuario(usuario,a1,a2,a3,a4)
+    negocio_text= 'Negocio recomendado: ' + nombre_negocio(negocio)
+    estimation_text='Calificación estimada: ' +  str(round(estimation))
+    real_text= 'Calificación Real: ' + str(round(real,1))
+    return negocio_text, estimation_text, real_text,negocio
 
 
 
+# data=df.to_dict('records')
+# negocios similares
+@app.callback(
+    [Output("recomend table", "data"),
+     Output("recomend similar graph", "figure")],
+    [Input("recomend bid", "children"),
+     Input("recomend similar model", "value")]
+)
+def fun_call(retorno,modelos):
+    lista_recomed=[i[1] for i in negocios_similares(retorno,modelos)]
+    dict_data=[{'Negocios recomendados': nombre_negocio(i)} for i in lista_recomed]
+    values_recomend=[i[0] for i in negocios_similares(retorno,modelos)]   
+    fig = go.Figure([go.Bar(x=[ nombre_negocio(i) for i in lista_recomed], y=values_recomend)])
+    return dict_data, fig
 
 
 if __name__ == "__main__":

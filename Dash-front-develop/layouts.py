@@ -17,11 +17,26 @@ import json
 
 # Surprise libraries
 
-from surprise import Reader
-from surprise import Dataset
-from surprise.model_selection import train_test_split
-from surprise import KNNBasic
-from surprise import accuracy
+from sklearn.model_selection import train_test_split
+from surprise.model_selection import train_test_split as train_test_split_surprise
+import surprise
+
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import linear_kernel 
+
+import numpy as np
+
+# cargar modelos
+
+sim_options = sim_options = {'name': 'cosine',
+               'user_based': False  # compute  similarities between items
+               }
+
+collabKNN = surprise.KNNBasic(k=40,sim_options=sim_options) #try removing sim_options. You'll find memory errors. 
+funkSVD = surprise.prediction_algorithms.matrix_factorization.SVD(n_factors=30,n_epochs=10,biased=True)
+coClus = surprise.prediction_algorithms.co_clustering.CoClustering(n_cltr_u=4,n_cltr_i=4,n_epochs=25)     
+slopeOne = surprise.prediction_algorithms.slope_one.SlopeOne()
+ 
 
 #export libraries
 
@@ -160,7 +175,7 @@ def graficar_red(edges,user):
                     )
     return fig
 
-
+# valor de la cantidad de datos a cargar
 n=10000
 
 # Users
@@ -213,14 +228,180 @@ rev_feel = pd.DataFrame(rev_feel.groupby(['stars', 'feeling']).agg({'prom':'mean
 rev_feel['stars'] = rev_feel['stars'].astype("str")
 ########
 
-
-
 total_data=pd.merge(review_df,business_df, on='business_id', how='inner')
 total_data=pd.merge(total_data, users_df, on='user_id',how='inner')
 total_data=pd.merge(total_data,check_df, on='business_id', how='inner')
 
-print(total_data)
+#Diccionario nombre de negocios
+business_dict=total_data[['business_id','name_x']].drop_duplicates().set_index('business_id').T.to_dict('list')
 
+########################### Preparar la data para los modelos
+
+# tomar los datos de ratings
+ratings=total_data[['user_id','business_id','stars_x']].rename(columns={'stars_x':'rating'})
+ratings.columns = ['n_users','n_items','rating']
+# data de entrenamiento
+rawTrain,rawholdout = train_test_split(ratings, test_size=0.25 )
+reader = surprise.Reader(rating_scale=(1,5)) 
+#into surprise:
+
+data = surprise.Dataset.load_from_df(rawTrain,reader)
+holdout = surprise.Dataset.load_from_df(rawholdout,reader)
+
+#cargar train y test de surprise para recalcular modelo
+ratings_surprise=surprise.Dataset.load_from_df(ratings,reader)
+train_set,test_set= train_test_split_surprise(ratings_surprise, test_size=0.5 )
+
+#########Entrenar modelos para mostrar recomendaciones
+coClus.fit(trainset=train_set)
+coClus_pred=coClus.test(test_set)
+
+collabKNN.fit(train_set)
+collabKNN_pred=collabKNN.test(test_set)
+
+funkSVD.fit(train_set)
+funkSVD_pred=funkSVD.test(test_set)
+
+slopeOne.fit(train_set)
+slopeOne_pred=slopeOne.test(test_set)
+
+########### modelado híbrido
+
+# vector de rmse híbrido
+kSplit = surprise.model_selection.split.KFold(n_splits=10, shuffle=True) # split data into folds. 
+
+rmseHyb=[]
+for trainset, testset in kSplit.split(data): #iterate through the folds.
+    slopeOne.fit(trainset)
+    collabKNN.fit(trainset)
+    funkSVD.fit(trainset)
+    coClus.fit(trainset)
+    predictions = [slopeOne.test(testset),
+                   collabKNN.test(testset),
+                   funkSVD.test(testset),
+                   coClus.test(testset)]
+    rmseHyb.append([surprise.accuracy.rmse(pred,verbose=True) for pred  in predictions])#get root means squared error    
+    
+
+########### modelado de similaridad
+
+
+# =============================================================================
+# Datos de la reseña
+# =============================================================================
+
+# incluir todos los textos en el negocio
+data_reviews=total_data.groupby(['business_id'])['text'].apply(','.join).reset_index()
+data_reviews=data_reviews.drop_duplicates()
+
+# Crear la matrix de términios de reviews    
+tfidf = TfidfVectorizer(ngram_range=(1, 1), min_df=0.0001, stop_words='english')
+tfidf_matrix = tfidf.fit_transform(data_reviews['text'])
+
+
+# Calcular similirdad del coseno de las demás películas
+cosine_similarities = linear_kernel(tfidf_matrix, tfidf_matrix)
+results = {}
+for idx, row in data_reviews.iterrows():
+   similar_indices = cosine_similarities[idx].argsort()[:-100:-1] 
+   similar_items = [(cosine_similarities[idx][i], data_reviews['business_id'][i]) for i in similar_indices] 
+   results[row['business_id']] = similar_items[1:]
+
+
+# =============================================================================
+# Datos de las características de los negocios
+# =============================================================================
+
+# funición que itere por los atributos
+def business_atributes(field):
+    atri=[]
+    if field=='nan':
+        atri=[]
+    else:
+        field=eval(field)
+        for i in field.keys():
+            if '{' in field[i]:
+                Dict = eval(field[i])
+                for j in Dict.keys():
+                    if Dict[j]==True:
+                        atri.append(i+j.capitalize())
+            if field[i]=='True':
+                atri.append(i)
+    return ' '.join(atri)        
+
+# Crear la tabla de atributos
+data_atributes=total_data[['business_id','attributes']]
+data_atributes['attributes']=data_atributes['attributes'].astype(str)
+data_atributes=data_atributes.drop_duplicates().reset_index()
+data_atributes['attributes']=data_atributes['attributes'].apply(lambda x: business_atributes(x))
+
+# Modelo basado en similaridad
+# Crear la matrix de términios de reviews    
+tfidf = TfidfVectorizer(ngram_range=(1, 1), min_df=0.0001)
+tfidf_matrix = tfidf.fit_transform(data_atributes['attributes'])
+
+# Calcular similirdad del coseno de las demás películas
+cosine_similarities = linear_kernel(tfidf_matrix, tfidf_matrix)
+results_at = {}
+for idx, row in data_atributes.iterrows():
+    similar_indices = cosine_similarities[idx].argsort()[:-100:-1] 
+    similar_items = [(cosine_similarities[idx][i], data_reviews['business_id'][i]) for i in similar_indices] 
+    results_at[row['business_id']] = similar_items[1:]
+
+########################## Funciones
+
+def rmseH(a1,a2,a3,a4,l):
+    rmse=[]
+    for j in range(len(l)):
+        rmse.append(l[j][0]*a1 + l[j][1]*a2  + l[j][2]*a3 + l[j][3]*a4)
+    return rmse
+
+def recomendacion_usuario(usuario,a1,a2,a3,a4):
+    alfa=[a1,a2,a3,a4]
+    # vector de predicciones   
+    neg_pred=[
+    (list(filter(lambda x: x[0]==usuario,coClus_pred))[0][1],list(filter(lambda x: x[0]==usuario,coClus_pred))[0][3]),
+    (list(filter(lambda x: x[0]==usuario,funkSVD_pred))[0][1],list(filter(lambda x: x[0]==usuario,funkSVD_pred))[0][3]),
+    (list(filter(lambda x: x[0]==usuario,collabKNN_pred))[0][1],list(filter(lambda x: x[0]==usuario,collabKNN_pred))[0][3]),
+    (list(filter(lambda x: x[0]==usuario,slopeOne_pred))[0][1],list(filter(lambda x: x[0]==usuario,slopeOne_pred))[0][3])
+    ]
+    
+    estimation=neg_pred[0][1]*alfa[0]+neg_pred[1][1]*alfa[1]+neg_pred[2][1]*alfa[2]+neg_pred[3][1]*alfa[3]   
+    negocio=np.unique(np.array([i[0] for i in neg_pred]))[0]
+    real=list(filter(lambda x: x[0]==usuario,coClus_pred))[0][2]
+    return negocio, estimation, real
+
+#recomendación del negocio    
+def negocios_similares(negocio,modelos):
+    # negocio=recomendacion_usuario(usuario,alfa)[0]
+    if modelos==1:
+        recomendacion=results[negocio] +results_at[negocio]
+    elif modelos==2:
+        recomendacion=results[negocio] 
+    elif modelos==3:
+        recomendacion=results_at[negocio]
+    recomendacion.sort(key=lambda x: x[0],reverse=True) 
+    # return [i[1] for i in recomendacion[0:14]]
+    return recomendacion[0:14]
+
+# alfas restantes
+def alfas_restantes(y):
+    x=(1-y)/3
+    return x,x,x
+
+# nombre de negocio
+def nombre_negocio(id):
+    nombre=business_dict[id][0]
+    return nombre
+
+
+# function to return key for any value
+def get_key_bus(val):
+    for key, value in business_dict.items():
+         if val == value:
+             return key
+ 
+    return "key doesn't exist"
 
 
 top_cards = dbc.Row([
