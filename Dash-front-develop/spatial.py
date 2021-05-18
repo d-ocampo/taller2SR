@@ -93,6 +93,7 @@ spatial = html.Div([
                                         min=0,
                                         max=1,
                                         step=0.1,
+                                        value=0.25
                                    )
                      ],
 
@@ -116,6 +117,7 @@ spatial = html.Div([
                                         min=0,
                                         max=1,
                                         step=0.1,
+                                        value=0.25
                                    )                    ],
 
                     className="pt-2 pb-2 box"
@@ -138,6 +140,7 @@ spatial = html.Div([
                                         min=0,
                                         max=1,
                                         step=0.1,
+                                        value=0.25
                                    )
   
                       ],

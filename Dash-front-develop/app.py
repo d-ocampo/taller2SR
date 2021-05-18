@@ -250,28 +250,28 @@ def fun_call(value):
 
 
 
-#Cambiar el valor de las tarjetas rmse
-# ingresa alfa 1
-@app.callback(
-    [Output("a2", "value"),
-     Output("a3", "value"),
-     Output("a4", "value")],
-    [Input("a1", "value")]
-)
-def fun_call(a):
-    alfas_list=list(alfas_restantes(a))
-    return alfas_list
+# #Cambiar el valor de las tarjetas rmse
+# # ingresa alfa 1
+# @app.callback(
+#     [Output("a2", "value"),
+#      Output("a3", "value"),
+#      Output("a4", "value")],
+#     [Input("a1", "value")]
+# )
+# def fun_call(a):
+#     alfas_list=list(alfas_restantes(a))
+#     return alfas_list
 
-# ingresa alfa 2,3,4
-@app.callback(
-    Output("a1", "value"),
-    [Input("a2", "value"),
-     Input("a3", "value"),
-     Input("a4", "value")]
-)
-def fun_call(a2,a3,a4):
-    a1 = 1 - a2 -a3- a4
-    return a1
+# # ingresa alfa 2,3,4
+# @app.callback(
+#     Output("a1", "value"),
+#     [Input("a2", "value"),
+#      Input("a3", "value"),
+#      Input("a4", "value")]
+# )
+# def fun_call(a2,a3,a4):
+#     a1 = 1 - a2 -a3- a4
+#     return a1
 
 
 # figura de vector de rmse hybrido

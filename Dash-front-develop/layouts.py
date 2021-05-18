@@ -176,7 +176,7 @@ def graficar_red(edges,user):
     return fig
 
 # valor de la cantidad de datos a cargar
-n=10000
+n=100000
 
 # Users
 users = []
