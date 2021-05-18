@@ -315,7 +315,7 @@ for idx, row in data_reviews.iterrows():
 # funición que itere por los atributos
 def business_atributes(field):
     atri=[]
-    if field=='nan':
+    if field=='nan' or field=='None':
         atri=[]
     else:
         field=eval(field)
@@ -330,9 +330,11 @@ def business_atributes(field):
     return ' '.join(atri)        
 
 # Crear la tabla de atributos
+
 data_atributes=total_data[['business_id','attributes']]
 data_atributes['attributes']=data_atributes['attributes'].astype(str)
 data_atributes=data_atributes.drop_duplicates().reset_index()
+print(data_atributes)
 data_atributes['attributes']=data_atributes['attributes'].apply(lambda x: business_atributes(x))
 
 # Modelo basado en similaridad
