@@ -577,29 +577,29 @@ home = html.Div([
                     style={"width": "18rem"},
                 ),
 
-                dbc.Card(
-                    # [
-                    #     dbc.CardImg(
-                    #         src="/assets/images/map.png", top=True),
-                    #     dbc.CardBody(
+                # dbc.Card(
+                #     [
+                #         dbc.CardImg(
+                #             src="/assets/images/map.png", top=True),
+                #         dbc.CardBody(
 
-                    #         [  html.H3("Exploración por usuarios", style = {"color": "#66666"}),
+                #             [  html.H3("Exploración por usuarios", style = {"color": "#66666"}),
 
-                    #             html.P(
-                    #                 '''
-                    #                 Finalmente, un apartado con las predicciones y el sistema diseñado para obtener recomendaciones de cualquier usuario en el sistema.
-                    #                 ''',
-                    #                 className="card-text", style = {"font-size": "15px"},
-                    #             ),
+                #                 html.P(
+                #                     '''
+                #                     Finalmente, un apartado con las predicciones y el sistema diseñado para obtener recomendaciones de cualquier usuario en el sistema.
+                #                     ''',
+                #                     className="card-text", style = {"font-size": "15px"},
+                #                 ),
 
-                    #             dbc.Button("Exploration", color="primary",
-                    #                        href="/page-3", style={"align": "center"}),
-                    #         ],
-                    #         className="text-center"
-                    #     ),
-                    # ],
-                    # style={"width": "18rem", "margin": "0 0 0 1rem"},                
-                    # )
+                #                 dbc.Button("Exploration", color="primary",
+                #                            href="/page-3", style={"align": "center"}),
+                #             ],
+                #             className="text-center"
+                #         ),
+                #     ],
+                #     style={"width": "18rem", "margin": "0 0 0 1rem"},                
+                #     )
 
             ]),
 
