@@ -251,9 +251,11 @@ def fun_call(value):
 #Cambiar el valor de las tarjetas rmse
 @app.callback(
     Output("recomend user", "children"),
-    [Input("recomend drop", "value")]
+    [Input("recomend list", "value")]
 )
 def fun_call(value):
+
+    
     return value
 
 

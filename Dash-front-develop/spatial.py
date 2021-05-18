@@ -160,6 +160,16 @@ spatial = html.Div([
                 dcc.Graph(id='recomend rmse')
             ])
         ])
+    ]),
+    dbc.Col([
+        dbc.Row([
+            dbc.Card([
+                dbc.CardBody([
+                    html.P(id='recomend list')
+                    
+                ])
+            ])
+        ])
     ])
 
 

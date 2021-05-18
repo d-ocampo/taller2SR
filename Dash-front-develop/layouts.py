@@ -161,7 +161,7 @@ def graficar_red(edges,user):
     return fig
 
 
-n=100000
+n=10000
 
 # Users
 users = []
